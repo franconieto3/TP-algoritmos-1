@@ -29,10 +29,10 @@ public class DataFrame {
     }
 
     // Constructor desde matriz 2D
-    public DataFrame(Object[][] array2D, List<?> columnLabels, List<?> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
+    public <T> DataFrame(T[][] array2D, List<?> columnLabels, List<?> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
         this();
-        List<List<Object>> data = new ArrayList<>();
-        for (Object[] row : array2D) {
+        List<List<T>> data = new ArrayList<>();
+        for (T[] row : array2D) {
             data.add(Arrays.asList(row));
         }
 
@@ -53,7 +53,7 @@ public class DataFrame {
     }
 
     // Constructor desde una sola columna
-    public DataFrame(List<Object> columnData, Object columnLabel, List<Object> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
+    public <T> DataFrame(List<Object> columnData, Object columnLabel, List<Object> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
         this();
         List<List<Object>> data = new ArrayList<>();
         for (Object value : columnData) {

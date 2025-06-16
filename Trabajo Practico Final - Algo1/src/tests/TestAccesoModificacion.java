@@ -54,28 +54,34 @@ public class TestAccesoModificacion {
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
+        System.out.println(" \n Se muestran las primeras dos filas de df1:");
         df1.head(2);
+
+        System.out.println(" \n Se muestran las ultimas dos filas de df1:");
         df1.tail(2);
 
         System.out.println("\n La cantidad de columnas es: " + df1.contarColumnas());
-        System.out.println("\n La cantidad de filas es: " + df1.contarFilas()+ "\n");
+        System.out.println("\n La cantidad de filas es: " + df1.contarFilas());
         df1.info();
         
         //Prueba 2.2: Elminar 1 fila y 1 columnas completas del DF 1.
-
+        System.out.println("\n Eliminamos dos filas no consecutivas de df1:");
         df1.removeRow(1);
         df1.removeRow(3);
-         
+        
+        System.out.println(" \n Se intenta eliminar una fila que no existe:");
         try{
             df1.removeRow(9);
         }catch(Exception e){
-            System.out.println("\n"+ e.getMessage()+"\n");
+            System.out.println(e.getMessage());
         }
 
+        System.out.println("\n Se elimina de df1 la columna 'Edad':");
         df1.removeColumn("Edad");
         df1.head(5);
 
         //Acceder al valor de una celda
+        System.out.println("Accedo al valor de la fila 0 y columna 'Apellido': ");
         System.out.println(df1.obtenerCelda(0,"Apellido"));
 
         try{
@@ -83,38 +89,40 @@ public class TestAccesoModificacion {
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
+        System.out.println("\n ¿Qué pasa si intento agregar una columna con distintos tipos de datos?");
         try{
             List<Object> numeros = List.of(10, "20", 30);
             df1.addColumnFromList(numeros, "Numeros");
         }catch(Exception e){
-            System.out.println("\n" + e.getMessage());
+            System.out.println(e.getMessage());
         }
 
         //Agrego una columna a partir de una lista
-
+        System.out.println("\n Ahora sí, agrego una columna consistente:");
         List<Object> numeros = List.of(10, 20, 30);
         df1.addColumnFromList(numeros, "Numeros");
 
         df1.head(5);
 
         //Modificación del valor de una celda
+        System.out.println("Intento modificar el valor de la celda en fila 4, columna 'Numeros'");
         try{
             df1.setValue(4, "Numeros", "tuki");
         }catch(Exception e){
-            System.out.println("\n" + e.getMessage()+"\n");
+            System.out.println(e.getMessage()+"\n");
         }
-
+        System.out.println("Intento nuevamente modificar el valor de la celda en fila 4, columna 'Numeros'");
         df1.setValue(4, "Numeros", 40);
         df1.head(5);
 
         //Imputación de valores faltantes en el segundo DataFrame
-        System.out.println("Imputación de valores faltantes en df2 \n");
+        System.out.println("Imputación de valores faltantes en df2");
         df2.fillna("Apellido","Fernandez");
         df2.head(10);
         
         //Carga del DataFrame en un CSV
         CSVExporter exportador = new CSVExporter();
         exportador.exportDataFrame(System.getProperty("user.dir").toString()+"/Trabajo Practico Final - Algo1/dataframe_exportado.csv", df2);
-
+        System.out.println("Guardamos el dataframe obtenido en un csv");
     }
 }

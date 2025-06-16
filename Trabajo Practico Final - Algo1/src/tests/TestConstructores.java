@@ -27,6 +27,8 @@ public class TestConstructores {
     public static void main(String[] args) {
         CSVParser csvParser = new CSVParser();
         //Prueba 1.1
+
+        System.out.println("\n DataFrame desde un archivo .csv que contiene encabezados \n");
         try{
             DataFrame df1 = csvParser.toDataFrame(System.getProperty("user.dir").toString()+"/Trabajo Practico Final - Algo1/prueba2.csv");
             df1.head(5);
@@ -86,7 +88,7 @@ public class TestConstructores {
         df4.head(5);
 
         //Prueba 1.6: DF6 --> Armar un DataFrame desde una matriz 2D con Labels de Filas, sin Labels de Columnas.
-        Object[][] array = {
+        Integer[][] array = {
             {1, 2, 3},
             {4, 5, 6},
             {7, 8, 9}
@@ -101,6 +103,7 @@ public class TestConstructores {
             {4, "Hola", 6},
             {7, 8, 9}
         };
+        System.out.println("Resultado de insertar un string en una array de números: \n");
         try{DataFrame df6 = new DataFrame(array2,null, null);
             df6.head(5);}
         catch(Exception e){
