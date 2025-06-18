@@ -29,31 +29,31 @@ public class DataFrame {
     }
 
     // Constructor desde matriz 2D
-    public <T> DataFrame(T[][] array2D, List<?> columnLabels, List<?> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
+    public <T> DataFrame(T[][] array2D, List<T> columnLabels, List<T> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
         this();
         List<List<T>> data = new ArrayList<>();
         for (T[] row : array2D) {
             data.add(Arrays.asList(row));
         }
 
-        List<Label> labelsC = adaptarLabels(columnLabels);
-        List<Label> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptarLabels(columnLabels);
+        List<Label<T>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
 
     // Constructor desde lista de listas 
-    public DataFrame(List<? extends List<?>> data, List<?> columnLabels, List<?> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
+    public <T> DataFrame(List<? extends List<?>> data, List<T> columnLabels, List<T> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
         this();
 
-        List<Label> labelsC = adaptarLabels(columnLabels);
-        List<Label> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptarLabels(columnLabels);
+        List<Label<T>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
 
     // Constructor desde una sola columna
-    public <T> DataFrame(List<Object> columnData, Object columnLabel, List<Object> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
+    public <T> DataFrame(List<Object> columnData, T columnLabel, List<T> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
         this();
         List<List<Object>> data = new ArrayList<>();
         for (Object value : columnData) {
@@ -62,23 +62,14 @@ public class DataFrame {
             data.add(row);
         }
 
-        List<Label> labelsC = adaptarLabels(List.of(columnLabel));
-        List<Label> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptarLabels(List.of(columnLabel));
+        List<Label<T>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
-     
-    // Constructor desde un mapa de columnas
-    /**
-     * Constructor que crea un DataFrame a partir de un mapa en el que
-     * las claves son las etiquetas de las columnas y los valores son listas con los datos de cada columna.
-     *
-     * @param dataMap Mapa con claves como etiquetas de columnas y listas de datos por columna.
-     * @throws InvalidShape si las columnas tienen diferentes cantidades de elementos.
-     * @throws IllegalArgumentException si el mapa está vacío o contiene datos nulos.
-     * @throws InvalidTypeException si algún dato no es de tipo soportado.
-     */
-    public DataFrame(Map<Object, List<Object>> dataMap) throws InvalidShape, IllegalArgumentException, InvalidTypeException {
+     /* 
+
+    public <T> DataFrame(Map<Object, List<Object>> dataMap) throws InvalidShape, IllegalArgumentException, InvalidTypeException {
         //Llama al constructor por defecto
         this();
         //Verifica que el mapa no sea nulo o vacío
@@ -99,26 +90,26 @@ public class DataFrame {
         }
 
         // Inicializa la firma del constructor DataFrame
-        List<Object> columnLabels = new ArrayList<>(dataMap.keySet()); //Crea las labels de columnas
+        List<T> columnLabels = new ArrayList<>(dataMap.keySet()); //Crea las labels de columnas
         List<Object> rowLabels = new ArrayList<>();
-        List<List<Object>> data = new ArrayList<>();
+        List<List<T>> data = new ArrayList<>();
         //Crea las labels de filas.
         for (int i = 0; i < expectedSize; i++) {
             data.add(new ArrayList<>());
             rowLabels.add(i);
         }
         //Crea la data del DataFrame a partir del mapa.
-        for (Object colLabel : columnLabels) {
+        for (T colLabel : columnLabels) {
             List<Object> colData = dataMap.get(colLabel);
             for (int i = 0; i < expectedSize; i++) {
                 data.get(i).add(colData.get(i));
             }
         }
         //Construye el DataFrame con Labels y data.
-        List<Label> labelsC = adaptarLabels(columnLabels);
-        List<Label> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptarLabels(columnLabels);
+        List<Label<T>> labelsR = adaptarLabels(rowLabels);
         generarDataFrame(data, labelsC, labelsR);
-    }
+    }*/
 
     // Constructor copia
     public DataFrame(DataFrame other) {
@@ -139,16 +130,16 @@ public class DataFrame {
 
     // --- 0.1 Metodos auxiliares de constructores ---
 
-    private List<Label> adaptarLabels(List<?> labels) throws IllegalArgumentException{
+    private <T> List<Label<T>> adaptarLabels(List<T> labels) throws IllegalArgumentException{
         
-        List<Label> aux = new ArrayList<>();
+        List<Label<T>> aux = new ArrayList<>();
 
         if (labels == null || labels.isEmpty()) {
             return aux; // Devuelve lista vacía
         }
 
-        for (Object l:labels){
-            Label label = new Label<>(l);
+        for (T l:labels){
+            Label<T> label = new Label<>(l);
             aux.add(label);
         }
         return aux;
@@ -159,7 +150,7 @@ public class DataFrame {
 
 
     // Método interno para poblar el dataframe
-    private void generarDataFrame(List<? extends List<?>> rows, List<Label> columnLabels, List<Label> rowLabels) throws InvalidShape, InvalidTypeException, IllegalArgumentException {
+    private <T> void generarDataFrame(List<? extends List<?>> rows, List<Label<T>> columnLabels, List<Label<T>> rowLabels) throws InvalidShape, InvalidTypeException, IllegalArgumentException {
         //Verifica que todas las listas dentro de rows tengan el mismo tamaño
         validateRowSize(rows);
         
