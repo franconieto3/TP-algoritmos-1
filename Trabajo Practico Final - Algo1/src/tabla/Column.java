@@ -4,40 +4,40 @@ import java.util.ArrayList;
 import java.util.List;
 import exceptions.*;
 
-public class Column<T> {
+public class Column {
     //Atributos
-    private Label<T> label;
-    private List<Cell<T>> cells;
+    private Label<?> label;
+    private List<Cell<?>> cells;
 
     //Constructores
-    public Column(Label<T> label){
+    public Column(Label<?> label){
         this.label = label;
         this.cells = new ArrayList<>();
     }
-    public Column(Label<T> label, List<Cell<T>> cells){
+    public Column(Label<?> label, List<Cell<?>> cells){
         this.label = label;
         this.cells = cells;
     }
 
     // Constructor copia con copia profunda
-    public Column(Column<T> other) {
+    public Column(Column other) {
         this.label = new Label<>(other.label); 
         this.cells = new ArrayList<>();
-        for (Cell<T> cell : other.cells) {
+        for (Cell<?> cell : other.cells) {
             this.cells.add(new Cell<>(cell)); 
         }
     }
 
     //Getters
 
-    public Label<T> getLabel() {
+    public Label<?> getLabel() {
         return this.label;
     }
-    public Cell<T> getCell(int i) throws IndexOutOfBoundsException{
+    public Cell<?> getCell(int i) throws IndexOutOfBoundsException{
         validarIndice(i);
         return cells.get(i);
     }
-    public List<Cell<T>> getCells(){
+    public List<Cell<?>> getCells(){
         return cells;
     }
     public Class<?> getType() {
@@ -52,7 +52,7 @@ public class Column<T> {
         // Si el primer valor es NA, no se puede usar como referencia para el tipo
         if (firstValue instanceof MissingValue) {
             // Buscar el primer valor no NA como referencia de tipo
-            for (Cell<T> c : cells) {
+            for (Cell<?> c : cells) {
                 if (!(c.getValue() instanceof MissingValue)) {
                     return c.getValue().getClass();
                 }
@@ -65,21 +65,20 @@ public class Column<T> {
 
     //Setters
 
-    public void setLabel(Label<T> label){
+    public void setLabel(Label<?> label){
         this.label=label;
     }
 
     //Metodos
 
 
-    public void addCell(Cell<?> cell) throws InvalidTypeException{
+    protected <T> void addCell(Cell<?> cell) throws InvalidTypeException{
          
         //tener en cuenta también los datos de tipo NA
         if(!validarTipo(cell)){
             throw new InvalidTypeException();
         }
-        //Prueba
-        //System.out.println(cell.getValue().toString() +": "+cell.getValue().getClass().toString());
+        
         cells.add(cell);
     }
 
@@ -87,7 +86,7 @@ public class Column<T> {
         return cells.size();
     }
 
-    public void setCell(int i, T value) throws IndexOutOfBoundsException, InvalidTypeException, IllegalStateException{
+    public void setCell(int i, Object value) throws IndexOutOfBoundsException, InvalidTypeException, IllegalStateException{
 
         //Comprobar que i esté dentro del tamaño de la lista
         validarIndice(i);
@@ -117,11 +116,11 @@ public class Column<T> {
         return i;
     }
 
-    private boolean validarTipo(Cell<T> cell) {
+    private boolean validarTipo(Cell<?> cell) {
         Object value = cell.getValue();
 
         // Aceptar valores NA sin importar el tipo
-        if (value instanceof MissingValue) {
+        if (value == null || value instanceof MissingValue) {
             return true;
         }
 
@@ -135,7 +134,7 @@ public class Column<T> {
         // Si el primer valor es NA, no se puede usar como referencia para el tipo
         if (firstValue instanceof MissingValue) {
             // Buscar el primer valor no NA como referencia de tipo
-            for (Cell<T> c : cells) {
+            for (Cell<?> c : cells) {
                 if (!(c.getValue() instanceof MissingValue)) {
                     firstValue = c.getValue();
                     break;
@@ -160,7 +159,7 @@ public class Column<T> {
         if (this == obj) return true; // Son la misma referencia
         if (obj == null || getClass() != obj.getClass()) return false;
 
-        Column<?> other = (Column<?>) obj;
+        Column other = (Column) obj;
 
         // Comparo las etiquetas
         if (this.label == null) {

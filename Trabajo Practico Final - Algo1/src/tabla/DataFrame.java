@@ -185,7 +185,7 @@ public class DataFrame {
         }
     }
 
-    private <T> void validateRowShape(List<? extends List<?>> rows, int expectedSize)throws InvalidShape{
+    private void validateRowShape(List<? extends List<?>> rows, int expectedSize)throws InvalidShape{
         for (List<?> row : rows){
             if(row.size()!=expectedSize){
                 throw new InvalidShape();
@@ -217,24 +217,34 @@ public class DataFrame {
     private <T> void fillColumns(List<? extends List<?>> rows, List<? extends Label<?>> columnLabels)throws InvalidTypeException{
         for (int i = 0; i < columnLabels.size(); i++) {
             Label<?> label = columnLabels.get(i);
-            Column<?> column = new Column<>(label);
-
+            Column column = new Column(label);
+            
             
             for (List<?> row : rows) {
                 Object value = row.get(i);
                 if (value == null || value.toString().equalsIgnoreCase("N/A")) {
-                    column.addCell(new Cell<>()); // valores faltantes tratados como null
+                    column.addCell(null); // valores faltantes tratados como null
                     continue;
                 }
-
-                if (!(value instanceof Number || value instanceof Boolean || value instanceof String || value instanceof Cell)) {
+                if(value instanceof Number){
+                    Number v = (Number) value;
+                    column.addCell(new Cell<>(v));
+                }
+                else if(value instanceof String){
+                    String v = (String) value;
+                    column.addCell(new Cell<>(v));
+                }
+                else if(value instanceof Boolean){
+                    Boolean v = (Boolean) value;
+                    column.addCell(new Cell<>(v));
+                }else{
                     throw new IllegalArgumentException("Tipo no soportado en la columna '" + label + "': " + value.getClass());
                 }
-                Cell<?> cell = new Cell<>(value);
-                column.addCell(cell);
             }
             columns.add(column);
         }
+
+
 
     }
 
@@ -443,7 +453,7 @@ public class DataFrame {
         int rowIndex = buscarFila(new Label(rowLabel));
         int colIndex = buscarColumna(new Label(columnLabel));
 
-        Column<?> col = columns.get(colIndex);
+        Column col = columns.get(colIndex);
         Class<?> expectedType = col.getType();
 
         if (newValue != null && !expectedType.isInstance(newValue)) {
@@ -457,7 +467,7 @@ public class DataFrame {
     }
 
     //Inserción de una columna
-    public void addColumn(Column<?> newColumn) {
+    public void addColumn(Column newColumn) {
         if (newColumn.getCells().size() != rows.size()) {
             throw new IllegalArgumentException("La nueva columna no tiene la misma cantidad de filas.");
         }
@@ -470,7 +480,7 @@ public class DataFrame {
         if (data.size() != rows.size()) {
             throw new IllegalArgumentException("La lista no tiene la misma cantidad de filas.");
         }
-        Column<Object> column = new Column<>(new Label<>(label));
+        Column column = new Column(new Label<>(label));
 
         for (Object value : data) {
 
@@ -496,7 +506,7 @@ public class DataFrame {
     public void removeRow(Object rowLabel) {
         int index = buscarFila(new Label(rowLabel));
         rows.remove(index);
-        for (Column<?> col : columns) {
+        for (Column col : columns) {
             col.getCells().remove(index);
         }
         //Reacomodo los indices de las filas

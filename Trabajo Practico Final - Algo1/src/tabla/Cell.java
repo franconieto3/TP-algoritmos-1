@@ -1,12 +1,19 @@
 package tabla;
 
+import java.util.List;
+
 public class Cell<T>{
     //Atributo
     private T content;
 
     //Constructor
     public Cell(T content){
-        this.content = content;
+        if(content instanceof Number || content instanceof String || content instanceof Boolean){
+            this.content = content;
+        }else{
+            throw new IllegalArgumentException("Tipo no soportado en la columna: " + content.getClass());
+        }
+        
     }
 
     public Cell(){
@@ -26,7 +33,12 @@ public class Cell<T>{
     public T getValue() {
         return this.content;
     }
-    public void setValue(T content){
-        this.content = content;
+    public void setValue(Object content){
+        try{
+            this.content = (T) content;
+        }catch(ClassCastException e){
+            throw e;
+        }
     }
+
 }

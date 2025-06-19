@@ -84,7 +84,7 @@ public class DataFrameHandler {
 
             if (cumple) {
                 List<Object> filaValores = new ArrayList<>();
-                for (Column<?> column : columns) {
+                for (Column column : columns) {
                     filaValores.add(column.getCell(rowIndex).getValue());
                 }
                 filteredData.add(filaValores);
@@ -92,7 +92,7 @@ public class DataFrameHandler {
         }
 
         List<Object> columnLabels = new ArrayList<>();
-        for (Column<?> column : columns) {
+        for (Column column : columns) {
             columnLabels.add(column.getLabel().getLabel());
         }
 
@@ -157,7 +157,7 @@ public class DataFrameHandler {
 
             for (Row row : sortedRows) {
                 List<Object> rowData = new ArrayList<>();
-                for (Column<?> col : columns) {
+                for (Column col : columns) {
                     rowData.add(col.getCell(row.getIndex()).getValue());
                 }
                 newData.add(rowData);
