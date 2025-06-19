@@ -7,22 +7,24 @@ public class Cell<T>{
     private T content;
 
     //Constructor
-    public Cell(T content){
-        if(content instanceof Number || content instanceof String || content instanceof Boolean){
-            this.content = content;
-        }else{
-            throw new IllegalArgumentException("Tipo no soportado en la columna: " + content.getClass());
-        }
-        
-    }
 
     public Cell(){
         this.content=null;
     }
+
+    public Cell(T content) throws IllegalArgumentException{
+        if(content instanceof Number || content instanceof String || content instanceof Boolean || content == null){
+            this.content = content;
+        } else {
+            throw new IllegalArgumentException("Tipo de dato no válido para una celda: " + content.getClass());
+        }
+    }
+
     // Constructor copia
     public Cell(Cell<T> other) {
         this.content = other.content;
     }
+    
     //Devolver null, si el contenido es nulo.
     @Override
     public String toString() {
@@ -33,11 +35,11 @@ public class Cell<T>{
     public T getValue() {
         return this.content;
     }
-    public void setValue(Object content){
-        try{
-            this.content = (T) content;
-        }catch(ClassCastException e){
-            throw e;
+    public void setValue(T content){
+        if(content instanceof Number || content instanceof String || content instanceof Boolean || content == null){
+            this.content = content;
+        } else {
+            throw new IllegalArgumentException("Tipo de dato no válido para una celda: " + content.getClass());
         }
     }
 

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import exceptions.*;
 
 public class DataFrameHandler {
-    
+    /* 
     //Atributo
     DataFrame df;
 
@@ -53,9 +53,9 @@ public class DataFrameHandler {
 
     }
 
-     /**
-     * Filtra las filas del DataFrame basado en una o más condiciones.
-     */
+     
+     //Filtra las filas del DataFrame basado en una o más condiciones.
+    
     public DataFrame filter(Map<Object, Predicate<Object>> conditions) {
         List<Row> rows = df.getRows();
         List<Column> columns = df.getColumns(); 
@@ -249,5 +249,5 @@ public class DataFrameHandler {
 
         return new DataFrame(data, columnLabels, null);
     }
-
+    */
 }

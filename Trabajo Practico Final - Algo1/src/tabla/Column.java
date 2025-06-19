@@ -4,26 +4,83 @@ import java.util.ArrayList;
 import java.util.List;
 import exceptions.*;
 
-public class Column {
+public class Column <T> {
     //Atributos
     private Label<?> label;
-    private List<Cell<?>> cells;
+    private List<Cell<T>> cells;
+    private final Class<T> type;
 
+    public Column(Label<?> label ,List<?> values) {
+        this.label = label;
+
+
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("La lista no puede ser nula ni vacía.");
+        }
+        Object first = null;
+
+        for(Object v: values){
+            if(v==null){continue;}
+            first = values.get(0);
+        }
+
+        if (!(first==null || first instanceof Number || first instanceof String || first instanceof Boolean)) {
+            throw new IllegalArgumentException("El tipo debe ser Number, String o Boolean.");
+        }
+        
+        // Establecer el tipo de la columna
+        @SuppressWarnings("unchecked")
+        Class<T> inferredType = (Class<T>) first.getClass();
+        this.type = inferredType;
+
+        // Verificar que todos los elementos sean del mismo tipo
+        for (Object obj : values) {
+            if(obj==null){
+                cells.add(null);
+                continue;
+            }
+            if (!type.isInstance(obj)) {
+                throw new IllegalArgumentException("Todos los elementos deben ser del mismo tipo: " + type.getSimpleName());
+            }
+
+            @SuppressWarnings("unchecked")
+            T value = (T) obj;
+            cells.add(new Cell<>(value));
+        }
+    }
+
+    public List<Cell<T>> getCells() {
+        return cells;
+    }
+
+    public Class<T> getColumnType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return "Column<" + type.getSimpleName() + ">{" + cells + '}';
+    }
+
+
+
+
+    /* 
     //Constructores
     public Column(Label<?> label){
         this.label = label;
         this.cells = new ArrayList<>();
     }
-    public Column(Label<?> label, List<Cell<?>> cells){
+    public Column(Label<?> label, List<Cell<T>> cells){
         this.label = label;
         this.cells = cells;
     }
 
     // Constructor copia con copia profunda
-    public Column(Column other) {
+    public Column(Column<T> other) {
         this.label = new Label<>(other.label); 
         this.cells = new ArrayList<>();
-        for (Cell<?> cell : other.cells) {
+        for (Cell<T> cell : other.cells) {
             this.cells.add(new Cell<>(cell)); 
         }
     }
@@ -37,7 +94,7 @@ public class Column {
         validarIndice(i);
         return cells.get(i);
     }
-    public List<Cell<?>> getCells(){
+    public List<Cell<T>> getCells(){
         return cells;
     }
     public Class<?> getType() {
@@ -72,7 +129,7 @@ public class Column {
     //Metodos
 
 
-    protected <T> void addCell(Cell<?> cell) throws InvalidTypeException{
+    protected void addCell(Cell<T> cell) throws InvalidTypeException{
          
         //tener en cuenta también los datos de tipo NA
         if(!validarTipo(cell)){
@@ -81,12 +138,15 @@ public class Column {
         
         cells.add(cell);
     }
+    protected void add(Object value){
+        cells.add(new Cell<>(value));
 
+    }
     public int size(){
         return cells.size();
     }
 
-    public void setCell(int i, Object value) throws IndexOutOfBoundsException, InvalidTypeException, IllegalStateException{
+    public void setCell(int i, T value) throws IndexOutOfBoundsException, InvalidTypeException, IllegalStateException{
 
         //Comprobar que i esté dentro del tamaño de la lista
         validarIndice(i);
@@ -132,7 +192,7 @@ public class Column {
         Object firstValue = cells.get(0).getValue();
 
         // Si el primer valor es NA, no se puede usar como referencia para el tipo
-        if (firstValue instanceof MissingValue) {
+        if (firstValue == null || firstValue instanceof MissingValue) {
             // Buscar el primer valor no NA como referencia de tipo
             for (Cell<?> c : cells) {
                 if (!(c.getValue() instanceof MissingValue)) {
@@ -177,6 +237,6 @@ public class Column {
         }
 
         return thisType.equals(otherType);
-    }
+    }*/
 
 }

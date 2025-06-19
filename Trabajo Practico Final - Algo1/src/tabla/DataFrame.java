@@ -25,7 +25,7 @@ public class DataFrame {
     public DataFrame() {
         this.columns = new ArrayList<>();
         this.rows = new ArrayList<>();
-        this.handler = new DataFrameHandler(this);
+        //this.handler = new DataFrameHandler(this);
     }
 
     // Constructor desde matriz 2D
@@ -67,49 +67,6 @@ public class DataFrame {
 
         generarDataFrame(data, labelsC, labelsR);
     }
-     /* 
-
-    public <T> DataFrame(Map<Object, List<Object>> dataMap) throws InvalidShape, IllegalArgumentException, InvalidTypeException {
-        //Llama al constructor por defecto
-        this();
-        //Verifica que el mapa no sea nulo o vacío
-        if (dataMap == null || dataMap.isEmpty()) {
-            throw new IllegalArgumentException("El mapa de datos no puede estar vacío.");
-        }
-        // Verifica que las columnas tengan la misma cantidad de elementos y calcula la cantidad de datos por columna.
-        int expectedSize = -1;
-        for (Map.Entry<Object, List<Object>> entry : dataMap.entrySet()) {
-            if (entry.getValue() == null) {
-                throw new IllegalArgumentException("Los datos de una columna no pueden ser nulos.");
-            }
-            if (expectedSize == -1) {
-                expectedSize = entry.getValue().size();
-            } else if (entry.getValue().size() != expectedSize) {
-                throw new InvalidShape("Las columnas no tienen la misma cantidad de filas.");
-            }
-        }
-
-        // Inicializa la firma del constructor DataFrame
-        List<T> columnLabels = new ArrayList<>(dataMap.keySet()); //Crea las labels de columnas
-        List<Object> rowLabels = new ArrayList<>();
-        List<List<T>> data = new ArrayList<>();
-        //Crea las labels de filas.
-        for (int i = 0; i < expectedSize; i++) {
-            data.add(new ArrayList<>());
-            rowLabels.add(i);
-        }
-        //Crea la data del DataFrame a partir del mapa.
-        for (T colLabel : columnLabels) {
-            List<Object> colData = dataMap.get(colLabel);
-            for (int i = 0; i < expectedSize; i++) {
-                data.get(i).add(colData.get(i));
-            }
-        }
-        //Construye el DataFrame con Labels y data.
-        List<Label<T>> labelsC = adaptarLabels(columnLabels);
-        List<Label<T>> labelsR = adaptarLabels(rowLabels);
-        generarDataFrame(data, labelsC, labelsR);
-    }*/
 
     // Constructor copia
     public DataFrame(DataFrame other) {
@@ -153,16 +110,18 @@ public class DataFrame {
     private <T> void generarDataFrame(List<? extends List<?>> rows, List<? extends Label<?>> columnLabels, List<? extends Label<?>> rowLabels) throws InvalidShape, InvalidTypeException, IllegalArgumentException {
         //Verifica que todas las listas dentro de rows tengan el mismo tamaño
         validateRowSize(rows);
-        
-        //Para la lista de filas, se verifica que el largo de cada fila coincida con la cantidad de headers de columnas
-        if(!columnLabels.isEmpty()){
-            validateRowShape(rows, columnLabels.size());
-        }
 
         //Manejar labels de columnas: generar nuevos si no label=null, o validar que las labels sean consistentes con la data
         if(columnLabels == null || columnLabels.isEmpty()){
             columnLabels = generateLabels(rows.get(0).size());
         }
+
+        //Para la lista de filas, se verifica que el largo de cada fila coincida con la cantidad de headers de columnas
+        if(!columnLabels.isEmpty()){
+            validateRowShape(rows, columnLabels.size());
+        }
+
+
         //Manejar labels de filas: generar nuevos si no label=null, o validar que las labels sean consistentes con la data
         if(rowLabels == null || rowLabels.isEmpty()){
             rowLabels = generateLabels(rows.size());
@@ -214,32 +173,29 @@ public class DataFrame {
     }
     
 
-    private <T> void fillColumns(List<? extends List<?>> rows, List<? extends Label<?>> columnLabels)throws InvalidTypeException{
+    private void fillColumns(List<? extends List<?>> rows, List<? extends Label<?>> columnLabels)throws InvalidTypeException{
         for (int i = 0; i < columnLabels.size(); i++) {
             Label<?> label = columnLabels.get(i);
-            Column column = new Column(label);
-            
-            
+            Column<?> column = new Column<>(label);
+
             for (List<?> row : rows) {
-                Object value = row.get(i);
-                if (value == null || value.toString().equalsIgnoreCase("N/A")) {
-                    column.addCell(null); // valores faltantes tratados como null
-                    continue;
+                column.add((Object) row.get(i));
+                /* 
+                if(row.get(i) instanceof Number){
+                  Number value = (Number) row.get(i);
+                  column.add(value);  
                 }
-                if(value instanceof Number){
-                    Number v = (Number) value;
-                    column.addCell(new Cell<>(v));
+                else if(row.get(i) instanceof String){
+                  String value = (String) row.get(i);
+                  column.add(value);  
                 }
-                else if(value instanceof String){
-                    String v = (String) value;
-                    column.addCell(new Cell<>(v));
-                }
-                else if(value instanceof Boolean){
-                    Boolean v = (Boolean) value;
-                    column.addCell(new Cell<>(v));
+                else if(row.get(i) instanceof Boolean){
+                  Boolean value = (Boolean) row.get(i);
+                  column.add(value);  
                 }else{
-                    throw new IllegalArgumentException("Tipo no soportado en la columna '" + label + "': " + value.getClass());
-                }
+                    throw new IllegalArgumentException("Tipo de dato no válido para una celda: " + row.get(i).getClass());
+                }*/
+                
             }
             columns.add(column);
         }
@@ -300,7 +256,7 @@ public class DataFrame {
     }
 
     // --- 3.0 Metodos de Visualización ---
-
+    /* 
     public void head(int n){
         
         int k = 0;
@@ -571,5 +527,5 @@ public class DataFrame {
     }
     
    }
-    
+    */
 }
