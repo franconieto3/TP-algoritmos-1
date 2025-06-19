@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TestConstructores",
+            "request": "launch",
+            "mainClass": "tests.TestConstructores",
+            "projectName": "TP-algoritmos-1_53dafd71"
+        },
+        {
+            "type": "java",
             "name": "TestMetodosGeneradores",
             "request": "launch",
             "mainClass": "tests.TestMetodosGeneradores",

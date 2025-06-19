@@ -150,22 +150,22 @@ public class DataFrame {
 
 
     // Método interno para poblar el dataframe
-    private <T> void generarDataFrame(List<? extends List<?>> rows, List<Label<T>> columnLabels, List<Label<T>> rowLabels) throws InvalidShape, InvalidTypeException, IllegalArgumentException {
+    private <T> void generarDataFrame(List<? extends List<?>> rows, List<? extends Label<?>> columnLabels, List<? extends Label<?>> rowLabels) throws InvalidShape, InvalidTypeException, IllegalArgumentException {
         //Verifica que todas las listas dentro de rows tengan el mismo tamaño
         validateRowSize(rows);
         
         //Para la lista de filas, se verifica que el largo de cada fila coincida con la cantidad de headers de columnas
         if(!columnLabels.isEmpty()){
-            validateRowShape(rows, columnLabels);
+            validateRowShape(rows, columnLabels.size());
         }
 
         //Manejar labels de columnas: generar nuevos si no label=null, o validar que las labels sean consistentes con la data
         if(columnLabels == null || columnLabels.isEmpty()){
-            columnLabels = generateColumnLabels(rows);
+            columnLabels = generateLabels(rows.get(0).size());
         }
         //Manejar labels de filas: generar nuevos si no label=null, o validar que las labels sean consistentes con la data
         if(rowLabels == null || rowLabels.isEmpty()){
-            rowLabels = generateRowLabels(rows);
+            rowLabels = generateLabels(rows.size());
         }
         //Evita que dos Labels sean iguales
         validarLabelsUnicos(columnLabels);
@@ -185,32 +185,23 @@ public class DataFrame {
         }
     }
 
-    private void validateRowShape(List<? extends List<?>> rows, List<Label> columnLabels)throws InvalidShape{
+    private <T> void validateRowShape(List<? extends List<?>> rows, int expectedSize)throws InvalidShape{
         for (List<?> row : rows){
-            if(row.size()!=columnLabels.size()){
+            if(row.size()!=expectedSize){
                 throw new InvalidShape();
             }
         }
     }
 
-    private List<Label> generateColumnLabels(List<? extends List<?>> rows){//argumento puede ser de tipo int: expectedSize
-        int nCols = rows.get(0).size();
-        List<Label> labels = new ArrayList<>();
-        for(int i=0; i<nCols; i++){
-            labels.add(new Label(i));
+    private <T> List<Label<Integer>> generateLabels(int size){//argumento puede ser de tipo int: expectedSize
+        List<Label<Integer>> labels = new ArrayList<>();
+        for(int i=0; i<size; i++){
+            labels.add(new Label<Integer>(i));
         }
         return labels;
     }
 
-    private List<Label> generateRowLabels(List<? extends List<?>> rows){//argumento puede ser de tipo int: expectedSize
-        List<Label> labels = new ArrayList<>();
-        for(int i=0; i<rows.size(); i++){
-            labels.add(new Label(i));
-        }
-        return labels;
-    }
-
-    private static void validarLabelsUnicos(List<Label> labels) throws IllegalArgumentException {
+    private static void validarLabelsUnicos(List<? extends Label<?>> labels) throws IllegalArgumentException {
 
         Set<Object> valoresVistos = new HashSet<>();
 
@@ -223,31 +214,32 @@ public class DataFrame {
     }
     
 
-    private void fillColumns(List<? extends List<?>> rows, List<Label> columnLabels)throws InvalidTypeException{
+    private <T> void fillColumns(List<? extends List<?>> rows, List<? extends Label<?>> columnLabels)throws InvalidTypeException{
         for (int i = 0; i < columnLabels.size(); i++) {
-            Label label = columnLabels.get(i);
-            Column column = new Column(label);
+            Label<?> label = columnLabels.get(i);
+            Column<?> column = new Column<>(label);
 
             
             for (List<?> row : rows) {
                 Object value = row.get(i);
                 if (value == null || value.toString().equalsIgnoreCase("N/A")) {
-                    column.addCell(new Cell(new MissingValue())); // valores faltantes tratados como null
+                    column.addCell(new Cell<>()); // valores faltantes tratados como null
                     continue;
                 }
 
                 if (!(value instanceof Number || value instanceof Boolean || value instanceof String || value instanceof Cell)) {
                     throw new IllegalArgumentException("Tipo no soportado en la columna '" + label + "': " + value.getClass());
                 }
-                
-                column.addCell(new Cell(value));
+                Cell<?> cell = new Cell<>(value);
+                column.addCell(cell);
             }
             columns.add(column);
         }
+
     }
 
 
-    private void fillRows(List<Label> rowLabels){
+    private void fillRows(List<? extends Label<?>> rowLabels){
         for (int i = 0; i < rowLabels.size(); i++) {
             this.rows.add(new Row(rowLabels.get(i),i));
         }

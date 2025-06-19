@@ -8,6 +8,10 @@ public class Cell<T>{
     public Cell(T content){
         this.content = content;
     }
+
+    public Cell(){
+        this.content=null;
+    }
     // Constructor copia
     public Cell(Cell<T> other) {
         this.content = other.content;

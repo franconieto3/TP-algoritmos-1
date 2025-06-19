@@ -72,7 +72,7 @@ public class Column<T> {
     //Metodos
 
 
-    public void addCell(Cell<T> cell) throws InvalidTypeException{
+    public void addCell(Cell<?> cell) throws InvalidTypeException{
          
         //tener en cuenta también los datos de tipo NA
         if(!validarTipo(cell)){
