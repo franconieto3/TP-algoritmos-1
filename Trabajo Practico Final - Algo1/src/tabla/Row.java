@@ -1,6 +1,8 @@
 package tabla;
 
-public class Row{
+import interfaces.Labeled;
+
+public class Row implements Labeled{
     //Atributos
     private Label<?> label;
     private int index;
@@ -28,5 +30,10 @@ public class Row{
     //Setter
     protected void setIndex(int i){
         this.index = i;
+    }
+
+    @Override
+    public String toString(){
+        return "Row: "+label+", index "+index;    
     }
 }

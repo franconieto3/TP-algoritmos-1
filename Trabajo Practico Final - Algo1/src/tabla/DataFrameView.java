@@ -85,7 +85,7 @@ public class DataFrameView {
         List<Column<?>> columns = df.getColumns();
         List<List<Cell<?>>> data = new ArrayList<>();
 
-        for(int i=start; i<df.contarFilas();i++){
+        for(int i=start; i<df.countRows();i++){
             if(i==end)break;
             List<Cell<?>> row = new ArrayList<>();
 

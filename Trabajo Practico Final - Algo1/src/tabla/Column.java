@@ -3,8 +3,9 @@ package tabla;
 import java.util.ArrayList;
 import java.util.List;
 import exceptions.*;
+import interfaces.Labeled;
 
-public class Column <T> {
+public class Column <T> implements Labeled{
 
     //Atributos
     private Label<?> label;
@@ -25,8 +26,14 @@ public class Column <T> {
     public Column(Column<T> other) {
         this.label = new Label<>(other.label); 
         this.cells = new ArrayList<>();
-        for (Cell<T> cell : other.cells) {
-            this.cells.add(new Cell<>(cell)); 
+        if(other.getCells()!=null || !(other.getCells().isEmpty())){
+            for (Cell<T> cell : other.getCells()) {
+                if(cell==null){
+                    this.add(null);
+                    continue;
+                }
+                this.add(cell.getValue()); 
+            }
         }
     }
 

@@ -1,8 +1,8 @@
 package tests;
 
 import importador.CSVParser;
-import tabla.DataFrame;
-import tabla.Column;
+
+import tabla.*;
 import java.util.List;
 
 
@@ -26,6 +26,10 @@ public class TestRefactoring {
             df1.tail(2);
 
             df1.info();
+            
+            System.out.println(df1.getRow(3));
+            System.out.println(df1.getColumn("Apellido"));
+            System.out.println(df1.getCell(3, "Apellido"));
 
         }catch(Exception e){
             System.err.println(("Error al importar el CSV: " + e.getMessage()));

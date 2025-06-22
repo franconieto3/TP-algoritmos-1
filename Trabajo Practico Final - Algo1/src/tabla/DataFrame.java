@@ -8,6 +8,7 @@ import java.util.Set;
 
 
 import exceptions.*;
+import interfaces.Labeled;
 
 public class DataFrame {
 
@@ -34,8 +35,8 @@ public class DataFrame {
             data.add(Arrays.asList(row));
         }
 
-        List<Label<T>> labelsC = adaptarLabels(columnLabels);
-        List<Label<T>> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptLabels(columnLabels);
+        List<Label<T>> labelsR = adaptLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
@@ -44,8 +45,8 @@ public class DataFrame {
     public <T> DataFrame(List<? extends List<?>> data, List<T> columnLabels, List<T> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
         this();
 
-        List<Label<T>> labelsC = adaptarLabels(columnLabels);
-        List<Label<T>> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptLabels(columnLabels);
+        List<Label<T>> labelsR = adaptLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
@@ -58,8 +59,8 @@ public class DataFrame {
             data.add(List.of(value));
         }
 
-        List<Label<T>> labelsC = adaptarLabels(List.of(columnLabel));
-        List<Label<T>> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptLabels(List.of(columnLabel));
+        List<Label<T>> labelsR = adaptLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
@@ -83,7 +84,7 @@ public class DataFrame {
 
     // --- 0.1 Metodos auxiliares de constructores ---
 
-    private <T> List<Label<T>> adaptarLabels(List<T> labels) throws IllegalArgumentException{
+    private <T> List<Label<T>> adaptLabels(List<T> labels) throws IllegalArgumentException{
         
         List<Label<T>> aux = new ArrayList<>();
 
@@ -123,8 +124,8 @@ public class DataFrame {
             rowLabels = generateLabels(rows.size());
         }
         //Evita que dos Labels sean iguales
-        validarLabelsUnicos(columnLabels);
-        validarLabelsUnicos(rowLabels);
+        UniqueLabels(columnLabels);
+        UniqueLabels(rowLabels);
         
         fillColumns(rows, columnLabels);
         fillRows(rowLabels);
@@ -156,7 +157,7 @@ public class DataFrame {
         return labels;
     }
 
-    private static void validarLabelsUnicos(List<? extends Label<?>> labels) throws IllegalArgumentException {
+    private static void UniqueLabels(List<? extends Label<?>> labels) throws IllegalArgumentException {
 
         Set<Object> valoresVistos = new HashSet<>();
 
@@ -198,13 +199,13 @@ public class DataFrame {
     public List<Row> getRows(){
         return new ArrayList<>(rows);
     }
-    public int contarColumnas(){
+    public int countColumns(){
         if(columns==null){
             return 0;
         }
         return columns.size(); 
     }
-    public int contarFilas(){
+    public int countRows(){
         if(rows==null){
             return 0;
         }
@@ -240,7 +241,6 @@ public class DataFrame {
         tabla.viewDataFrame(start,rows.size(), this);  
     }
     
-
     public void info(){
 
         System.out.println(" \n" + "Data columns: total "+this.columns.size());
@@ -254,94 +254,76 @@ public class DataFrame {
             System.out.println(label + ": "+ (columns.size()-na) + " non-null, "+ tipo);
         }
     }
-/* 
+ 
     //Acceso indexado
 
     // --- 3.1 Metodos auxiliares de Visualización ---
-    
-    protected List<Object> buildRow(int i, List<Column> list){
-        List<Object> row = new ArrayList<>();
-        for (Column c : list){
+    /* 
+    protected List<?> buildRow(int i, List<Column<?>> list){
+        List<?> row = new ArrayList<>();
+        for (Column<?> c : list){
             row.add(c.getCell(i).getValue());
         }
         //System.out.println(i+": "+ row);
         return row;
     }
 
-
+*/
 
     // --- 4.0 Metodos de acceso indexado y selección ---
 
-    public Row obtenerFila(Object input) throws IndexOutOfBoundsException {
-        int index = -1;
+    public Row getRow(Object input) throws IndexOutOfBoundsException {
 
-        if (input instanceof Label) {
-            index = buscarFila((Label) input);
-        } else if (input instanceof String) {
-            index = buscarFila(new Label((String) input));
-        } else if (input instanceof Integer) {
-            index = (Integer) input;
-            if (index < 0 || index >= rows.size()) {
-                throw new IndexOutOfBoundsException("Índice fuera de rango: " + index);
-            }
-        } else {
-            throw new IllegalArgumentException("Tipo de argumento no soportado: " + input.getClass());
-        }
+        Label<?> label = validateLabel(input);
+        int index = indexOf(label,rows);
+
         return new Row(rows.get(index));
     }
 
-    protected int buscarFila(Label label) {
-        for (int i = 0; i < rows.size(); i++) {
-            if (label.equals(rows.get(i).getLabel())) {
-                return i;
-            }
-        }
-        throw new IndexOutOfBoundsException("Fila con etiqueta no encontrada: " + label);
-    }
+    public Column<?> getColumn(Object input) throws IndexOutOfBoundsException {
 
-    public Column obtenerColumna(Object input) throws IndexOutOfBoundsException {
-        int index = -1;
-
-        if (input instanceof Label) {
-            index = buscarColumna((Label) input);
-        } else if (input instanceof String) {
-            index = buscarColumna(new Label((String) input));
-        } else if (input instanceof Integer) {
-            index = (Integer) input;
-            if (index < 0 || index >= columns.size()) {
-                throw new IndexOutOfBoundsException("Índice fuera de rango: " + index);
-            }
-        } else {
-            throw new IllegalArgumentException("Tipo de argumento no soportado: " + input.getClass());
-        }
-
+        Label<?> label = validateLabel(input);
+        int index = indexOf(label, columns);
+        
         // Obtener la columna y construir la lista de celdas
-        return new Column(columns.get(index));
+        return new Column<>(columns.get(index));
     }
 
-    public Cell<?> obtenerCelda(Object rowLabel, Object columnLabel){
-        int indice = this.obtenerFila(rowLabel).getIndex();
-        Cell celda = this.obtenerColumna(columnLabel).getCell(indice);
+    public Cell<?> getCell(Object rowLabel, Object columnLabel){
+        int indice = this.getRow(rowLabel).getIndex();
+        Cell<?> celda = this.getColumn(columnLabel).getCell(indice);
         return new Cell<>(celda);
     }
 
-    protected int buscarColumna(Label label) {
-        for (int i = 0; i < columns.size(); i++) {
-            if (label.equals(columns.get(i).getLabel())) {
+    private Label<?> validateLabel(Object input){
+        if (input instanceof Label<?>) {
+            return (Label<?>) input;
+        } else if (input instanceof String) {
+            return new Label<>((String) input);
+        } else if (input instanceof Integer) {
+            return new Label<>((Integer) input);
+        } else {
+            throw new IllegalArgumentException("Tipo de argumento no soportado: " + input.getClass());
+        }
+    }
+
+    protected int indexOf(Label<?> label, List<? extends Labeled> axis) {
+        for (int i = 0; i < axis.size(); i++) {
+            if (label.equals(axis.get(i).getLabel())) {
                 return i;
             }
         }
-        throw new IndexOutOfBoundsException("Fila con etiqueta no encontrada: " + label);
+        throw new IndexOutOfBoundsException("Etiqueta no encontrada: " + label);
     }
 
-
+    /* 
 
     //Modificación del DataFrame
 
     //Modificación de una celda
     public void setValue(Object rowLabel, Object columnLabel, Object newValue) {
-        int rowIndex = buscarFila(new Label(rowLabel));
-        int colIndex = buscarColumna(new Label(columnLabel));
+        int rowIndex = findRow(new Label(rowLabel));
+        int colIndex = findColumn(new Label(columnLabel));
 
         Column col = columns.get(colIndex);
         Class<?> expectedType = col.getType();
@@ -389,12 +371,12 @@ public class DataFrame {
 
     //Eliminación de una columna
     public void removeColumn(Object columnLabel) {
-        int index = buscarColumna(new Label(columnLabel));
+        int index = findColumn(new Label(columnLabel));
         columns.remove(index);
     }
     //Eliminación de una fila
     public void removeRow(Object rowLabel) {
-        int index = buscarFila(new Label(rowLabel));
+        int index = findRow(new Label(rowLabel));
         rows.remove(index);
         for (Column col : columns) {
             col.getCells().remove(index);
@@ -440,7 +422,7 @@ public class DataFrame {
    
    //Imputación de valores faltantes
    public void fillna(Object label, Object value){
-        int colIndex = buscarColumna(new Label(label));
+        int colIndex = findColumn(new Label(label));
         Column column = columns.get(colIndex);
 
     Class<?> expectedType = column.getType();
