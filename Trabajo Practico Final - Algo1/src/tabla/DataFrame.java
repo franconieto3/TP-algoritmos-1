@@ -34,18 +34,18 @@ public class DataFrame {
             data.add(Arrays.asList(row));
         }
 
-        List<Label<T>> labelsC = adaptarLabels(columnLabels);
-        List<Label<T>> labelsR = adaptarLabels(rowLabels);
+        List<Label<?>> labelsC = adaptarLabels(columnLabels);
+        List<Label<?>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
 
     // Constructor desde lista de listas 
-    public <T> DataFrame(List<? extends List<?>> data, List<T> columnLabels, List<T> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
+    public DataFrame(List<? extends List<?>> data, List<?> columnLabels, List<?> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
         this();
 
-        List<Label<T>> labelsC = adaptarLabels(columnLabels);
-        List<Label<T>> labelsR = adaptarLabels(rowLabels);
+        List<Label<?>> labelsC = adaptarLabels(columnLabels);
+        List<Label<?>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
@@ -60,8 +60,8 @@ public class DataFrame {
             data.add(row);
         }
 
-        List<Label<T>> labelsC = adaptarLabels(List.of(columnLabel));
-        List<Label<T>> labelsR = adaptarLabels(rowLabels);
+        List<Label<?>> labelsC = adaptarLabels(List.of(columnLabel));
+        List<Label<?>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
@@ -85,16 +85,16 @@ public class DataFrame {
 
     // --- 0.1 Metodos auxiliares de constructores ---
 
-    private <T> List<Label<T>> adaptarLabels(List<T> labels) throws IllegalArgumentException{
+    private List<Label<?>> adaptarLabels(List<?> labels) throws IllegalArgumentException{
         
-        List<Label<T>> aux = new ArrayList<>();
+        List<Label<?>> aux = new ArrayList<>();
 
         if (labels == null || labels.isEmpty()) {
             return aux; // Devuelve lista vacía
         }
 
-        for (T l:labels){
-            Label<T> label = new Label<>(l);
+        for (Object l:labels){
+            Label<?> label = new Label<>(l);
             aux.add(label);
         }
         return aux;
@@ -150,7 +150,7 @@ public class DataFrame {
         }
     }
 
-    private <T> List<Label<Integer>> generateLabels(int size){//argumento puede ser de tipo int: expectedSize
+    private List<Label<Integer>> generateLabels(int size){//argumento puede ser de tipo int: expectedSize
         List<Label<Integer>> labels = new ArrayList<>();
         for(int i=0; i<size; i++){
             labels.add(new Label<Integer>(i));
@@ -178,28 +178,10 @@ public class DataFrame {
 
             for (List<?> row : rows) {
                 column.add((Object) row.get(i));
-                /* 
-                if(row.get(i) instanceof Number){
-                  Number value = (Number) row.get(i);
-                  column.add(value);  
-                }
-                else if(row.get(i) instanceof String){
-                  String value = (String) row.get(i);
-                  column.add(value);  
-                }
-                else if(row.get(i) instanceof Boolean){
-                  Boolean value = (Boolean) row.get(i);
-                  column.add(value);  
-                }else{
-                    throw new IllegalArgumentException("Tipo de dato no válido para una celda: " + row.get(i).getClass());
-                }*/
-                
             }
+
             columns.add(column);
         }
-
-
-
     }
 
 
@@ -209,14 +191,6 @@ public class DataFrame {
         }
     }
 
-
-
-    public static final Object NA = new Object() {
-    @Override
-        public String toString() {
-            return "N/A";
-        }
-    };
 
     //--- 2.0 Getters ---
 
