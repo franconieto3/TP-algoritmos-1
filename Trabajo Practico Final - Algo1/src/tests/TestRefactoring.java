@@ -4,7 +4,7 @@ import importador.CSVParser;
 import tabla.DataFrame;
 import tabla.Column;
 import java.util.List;
-import java.util.ArrayList;
+
 
 public class TestRefactoring {
 
@@ -16,9 +16,17 @@ public class TestRefactoring {
         try{
             DataFrame df1 = csvParser.toDataFrame(System.getProperty("user.dir").toString()+"/Trabajo Practico Final - Algo1/prueba2.csv");
             List<Column<?>> columns = df1.getColumns();
+             
             for (Column<?> c : columns){
                 System.out.println(c);
             }
+
+            df1.head(2);
+
+            df1.tail(2);
+
+            df1.info();
+
         }catch(Exception e){
             System.err.println(("Error al importar el CSV: " + e.getMessage()));
         }

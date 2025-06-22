@@ -41,7 +41,7 @@ public class Label <T>{
 
         Label<?> otherLabel = (Label<?>) other;
 
-        return value.equals(otherLabel.value);
+        return value.equals(otherLabel.getLabel());
     }
 
     @Override

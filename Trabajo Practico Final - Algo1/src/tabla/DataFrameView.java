@@ -1,5 +1,6 @@
 package tabla;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DataFrameView {
@@ -19,10 +20,10 @@ public class DataFrameView {
         this.MAX_CELL_CHARS = MAX_CELL_CHARS;
     }
 
-    public static String formatTable(List<List<Object>> rows, List<Label> rowLabels, List<Label> columnLabels) {
+    public static String formatTable(List<? extends List<?>> data, List<?> rowLabels, List<?> columnLabels) {
         StringBuilder sb = new StringBuilder();
 
-        int totalRows = Math.min(rows.size(), MAX_ROWS);
+        int totalRows = Math.min(data.size(), MAX_ROWS);
         int totalCols = columnLabels != null ? Math.min(columnLabels.size(), MAX_COLS) : 0;
 
         // Formato de encabezado
@@ -44,9 +45,15 @@ public class DataFrameView {
             sb.append(padRight(rowLabel, MAX_CELL_CHARS));
 
             // Celdas
-            List<Object> rowCells = rows.get(row);
+            List<?> rowCells = data.get(row);
             for (int col = 0; col < totalCols && col < rowCells.size(); col++) {
-                sb.append(padRight(truncate(rowCells.get(col).toString()), MAX_CELL_CHARS));
+                Object cell = rowCells.get(col);
+                if (cell==null){
+                    sb.append(padRight(truncate("N/A"), MAX_CELL_CHARS));
+                }
+                else{
+                sb.append(padRight(truncate(cell.toString()), MAX_CELL_CHARS));
+                }
             }
 
             if (rowCells.size() > MAX_COLS) {
@@ -55,7 +62,7 @@ public class DataFrameView {
             sb.append("\n");
         }
 
-        if (rows.size() > MAX_ROWS) {
+        if (data.size() > MAX_ROWS) {
             sb.append("...\n");
         }
 
@@ -71,5 +78,27 @@ public class DataFrameView {
         return String.format("%-" + length + "s", text);
     }
 
+
+    public void viewDataFrame(int start, int end, DataFrame df){
+        List<Label<?>> colLabels = df.getColumnLabels();
+        List<Label<?>> rowLabels =  new ArrayList<>();
+        List<Column<?>> columns = df.getColumns();
+        List<List<Cell<?>>> data = new ArrayList<>();
+
+        for(int i=start; i<df.contarFilas();i++){
+            if(i==end)break;
+            List<Cell<?>> row = new ArrayList<>();
+
+            for(Column<?> c: columns){
+                row.add(c.getCell(i));
+                
+            }
+            rowLabels.add(df.getRowLabels().get(i));
+            data.add(row);
+        }
+
+        String tabla = formatTable(data, rowLabels, colLabels);
+        System.out.println(tabla);
+    }
 
 }

@@ -27,7 +27,7 @@ public class Cell<T>{
     //Devolver null, si el contenido es nulo.
     @Override
     public String toString() {
-        return content != null ? content.toString() : "null";
+        return content != null ? content.toString() : "N/A";
     }
 
     //Metodos

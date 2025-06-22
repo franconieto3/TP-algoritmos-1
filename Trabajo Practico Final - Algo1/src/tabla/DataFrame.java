@@ -34,18 +34,18 @@ public class DataFrame {
             data.add(Arrays.asList(row));
         }
 
-        List<Label<?>> labelsC = adaptarLabels(columnLabels);
-        List<Label<?>> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptarLabels(columnLabels);
+        List<Label<T>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
 
     // Constructor desde lista de listas 
-    public DataFrame(List<? extends List<?>> data, List<?> columnLabels, List<?> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
+    public <T> DataFrame(List<? extends List<?>> data, List<T> columnLabels, List<T> rowLabels) throws InvalidShape, IllegalArgumentException,InvalidTypeException {
         this();
 
-        List<Label<?>> labelsC = adaptarLabels(columnLabels);
-        List<Label<?>> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptarLabels(columnLabels);
+        List<Label<T>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
@@ -55,13 +55,11 @@ public class DataFrame {
         this();
         List<List<Object>> data = new ArrayList<>();
         for (Object value : columnData) {
-            List<Object> row = new ArrayList<>();
-            row.add(value);
-            data.add(row);
+            data.add(List.of(value));
         }
 
-        List<Label<?>> labelsC = adaptarLabels(List.of(columnLabel));
-        List<Label<?>> labelsR = adaptarLabels(rowLabels);
+        List<Label<T>> labelsC = adaptarLabels(List.of(columnLabel));
+        List<Label<T>> labelsR = adaptarLabels(rowLabels);
 
         generarDataFrame(data, labelsC, labelsR);
     }
@@ -85,16 +83,16 @@ public class DataFrame {
 
     // --- 0.1 Metodos auxiliares de constructores ---
 
-    private List<Label<?>> adaptarLabels(List<?> labels) throws IllegalArgumentException{
+    private <T> List<Label<T>> adaptarLabels(List<T> labels) throws IllegalArgumentException{
         
-        List<Label<?>> aux = new ArrayList<>();
+        List<Label<T>> aux = new ArrayList<>();
 
         if (labels == null || labels.isEmpty()) {
             return aux; // Devuelve lista vacía
         }
 
-        for (Object l:labels){
-            Label<?> label = new Label<>(l);
+        for (T l:labels){
+            Label<T> label = new Label<>(l);
             aux.add(label);
         }
         return aux;
@@ -228,72 +226,36 @@ public class DataFrame {
     }
 
     // --- 3.0 Metodos de Visualización ---
-    /* 
+    
     public void head(int n){
-        
-        int k = 0;
-        List<Label> colLabels = new ArrayList<>();
-        List<Label> rowLabels = new ArrayList<>();
-        List<List<Object>> ListOfRows = new ArrayList<>();
-
-        for(Column c:columns){
-            colLabels.add(c.getLabel());
-        }
-        for(Row row: rows){
-           if(k==n){break;}
-            int j = row.getIndex();
-            rowLabels.add(row.getLabel());
-            List<Object> rowList = buildRow(j,columns);
-            ListOfRows.add(rowList);
-            k++;
-        }
-
         DataFrameView tabla = new DataFrameView();
-        System.out.println(tabla.formatTable(ListOfRows, rowLabels, colLabels));
+        tabla.viewDataFrame(0,n, this);
     }
 
-    public void tail(int n) {
-        
+    public void tail(int n){
         int totalRows = rows.size();
         int start = Math.max(0, totalRows - n); // En caso de que n > totalRows
-        
-        List<Label> colLabels = new ArrayList<>();
-        List<Label> rowLabels = new ArrayList<>();
-        List<List<Object>> listOfRows = new ArrayList<>();
-
-        for (Column c : columns) {
-            colLabels.add(c.getLabel());
-        }
-
-        for (int i = start; i < totalRows; i++) {
-            Row row = rows.get(i);
-            int j = row.getIndex();
-            rowLabels.add(row.getLabel());
-            List<Object> rowList = buildRow(j,columns);
-            listOfRows.add(rowList);
-        }
 
         DataFrameView tabla = new DataFrameView();
-        System.out.println(tabla.formatTable(listOfRows, rowLabels, colLabels));
+        tabla.viewDataFrame(start,rows.size(), this);  
     }
+    
 
     public void info(){
 
         System.out.println(" \n" + "Data columns: total "+this.columns.size());
+        
+        for (Column<?> c : columns){
 
-        for (Column c : columns){
-
-            Label label = c.getLabel();
+            Label<?> label = c.getLabel();
             int na = c.countNA();
-            Class<?> tipo =c.getType();
+            String tipo =c.getType().getSimpleName();
 
             System.out.println(label + ": "+ (columns.size()-na) + " non-null, "+ tipo);
         }
     }
-
+/* 
     //Acceso indexado
-
-
 
     // --- 3.1 Metodos auxiliares de Visualización ---
     

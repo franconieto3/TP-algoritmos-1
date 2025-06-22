@@ -36,7 +36,9 @@ public class Column <T> {
         return this.label;
     }
     public Cell<?> getCell(int i) throws IndexOutOfBoundsException{
-        validarIndice(i);
+        if (i < 0 || i >= cells.size()) {
+            throw new IndexOutOfBoundsException("Índice fuera del rango: " + i + ". Columna: "+ label.toString());
+        }
         return cells.get(i);
     }
     public List<Cell<T>> getCells(){
@@ -45,6 +47,9 @@ public class Column <T> {
     public Class<?> getType() {
         return type;
     }
+    public int size(){
+        return cells.size();
+    }
 
     //Setters
 
@@ -52,8 +57,8 @@ public class Column <T> {
         this.label=label;
     }
 
-    //Metodos
 
+    //Metodos
 
     protected void addCell(Cell<T> cell) throws InvalidTypeException{
         if (cell == null) {
@@ -63,7 +68,7 @@ public class Column <T> {
 
         add(cell.getValue());
     }
-    protected void add(Object obj) throws ClassCastException{
+    protected void add(Object obj) throws ClassCastException, InvalidTypeException{
         
         //Si el dato es null, agregarlo igualmente
         if(obj == null){
@@ -87,11 +92,9 @@ public class Column <T> {
         cells.add(new Cell<>(value));
 
     }
-    public int size(){
-        return cells.size();
-    }
 
-    public void setCell(int i, T value) throws IndexOutOfBoundsException, InvalidTypeException, IllegalStateException{
+
+    protected void setCell(int i, T value) throws IndexOutOfBoundsException, InvalidTypeException, IllegalStateException{
 
         //Comprobar que i esté dentro del tamaño de la lista
 
@@ -102,19 +105,13 @@ public class Column <T> {
     }
 
     public int countNA(){
-        int i=0;
-        for (Cell<T> c:cells){
-            if (c.getValue() instanceof MissingValue){
-                i++;
+        int n=0;
+        for (int i = 0; i<cells.size();i++){
+            if (cells.get(i)==null){
+                n++;
             }
         }
-        return i;
-    }
-
-    private void validarIndice(int i){
-        if (i < 0 || i >= cells.size()) {
-            throw new IndexOutOfBoundsException("Índice fuera del rango: " + i);
-    }
+        return n;
     }
 
     
@@ -128,7 +125,8 @@ public class Column <T> {
         // Comparo las etiquetas
         if (this.label == null) {
             if (other.label != null) return false;
-        } else if (!this.label.equals(other.label)) {
+        } 
+        else if (!this.label.equals(other.label)) {
             return false;
         }
 

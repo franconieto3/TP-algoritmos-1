@@ -1,7 +1,4 @@
 package tabla;
-import tabla.Cell;
-
-import java.util.List;
 
 public class Row{
     //Atributos
@@ -10,7 +7,7 @@ public class Row{
 
     //Constructor
 
-    public Row (Label label, int index){
+    public Row (Label<?> label, int index){
         this.label = label;
         this.index = index;
     }
