@@ -1,6 +1,5 @@
 package tabla;
 
-import java.util.List;
 
 public class Cell<T>{
     //Atributo

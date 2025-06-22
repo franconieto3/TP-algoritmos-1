@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TestRefactoring",
+            "request": "launch",
+            "mainClass": "tests.TestRefactoring",
+            "projectName": "TP-algoritmos-1_ff8e24bc"
+        },
+        {
+            "type": "java",
             "name": "TestConstructores",
             "request": "launch",
             "mainClass": "tests.TestConstructores",

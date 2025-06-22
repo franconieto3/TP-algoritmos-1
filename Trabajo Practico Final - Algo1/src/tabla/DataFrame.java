@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.*;
-import java.util.Collections;
+
 
 import exceptions.*;
 
@@ -15,9 +13,9 @@ public class DataFrame {
 
     // --- 0. atributos ---
 
-    private List<Column> columns;
+    private List<Column<?>> columns;
     private List<Row> rows;
-    private DataFrameHandler handler;
+    //private DataFrameHandler handler;
       
     // --- 1.0 Constructores ---
 
@@ -76,8 +74,8 @@ public class DataFrame {
         this.columns = new ArrayList<>();
         this.rows = new ArrayList<>();
 
-        for (Column col : other.columns) {
-            this.columns.add(new Column(col)); 
+        for (Column<?> col : other.columns) {
+            this.columns.add(new Column<>(col)); 
         }
 
         for (Row row : other.rows) {
@@ -222,7 +220,7 @@ public class DataFrame {
 
     //--- 2.0 Getters ---
 
-    public List<Column> getColumns(){
+    public List<Column<?>> getColumns(){
         return new ArrayList<>(columns);
     }
     public List<Row> getRows(){
@@ -240,15 +238,15 @@ public class DataFrame {
         }
         return rows.size();
     }
-    public List<Label> getColumnLabels(){
-        List<Label> lista = new ArrayList<>();
-        for(Column c: columns){
+    public List<Label<?>> getColumnLabels(){
+        List<Label<?>> lista = new ArrayList<>();
+        for(Column<?> c: columns){
             lista.add(c.getLabel());
         }
         return lista;
     }
-    public List<Label> getRowLabels(){
-        List<Label> lista = new ArrayList<>();
+    public List<Label<?>> getRowLabels(){
+        List<Label<?>> lista = new ArrayList<>();
         for(Row r: rows){
             lista.add(r.getLabel());
         }
