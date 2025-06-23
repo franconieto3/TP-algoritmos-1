@@ -2,6 +2,7 @@ package tabla;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import exceptions.*;
 import interfaces.Labeled;
 
@@ -17,10 +18,13 @@ public class Column <T> implements Labeled{
         this.label = label;
         this.cells = new ArrayList<>();
     }
+    
+    /* 
     public Column(Label<?> label, List<Cell<T>> cells){
         this.label = label;
         this.cells = cells;
     }
+    */
 
     // Constructor copia con copia profunda
     public Column(Column<T> other) {
@@ -48,7 +52,7 @@ public class Column <T> implements Labeled{
         }
         return cells.get(i);
     }
-    public List<Cell<T>> getCells(){
+    protected List<Cell<T>> getCells(){
         return cells;
     }
     public Class<?> getType() {
@@ -100,15 +104,30 @@ public class Column <T> implements Labeled{
 
     }
 
+    protected void setCell(int i, Object value) {
+        if (i < 0 || i >= cells.size()) {
+            throw new IndexOutOfBoundsException("Index " + i + " out of bounds");
+        }
 
-    protected void setCell(int i, T value) throws IndexOutOfBoundsException, InvalidTypeException, IllegalStateException{
+        if (value == null) {
+            cells.set(i, null);
+            return;
+        }
 
-        //Comprobar que i esté dentro del tamaño de la lista
+        if (!this.type.isInstance(value)) {
+            throw new IllegalArgumentException("Tipo de dato no coincide con el de la columna: se esperaba "+ this.type.getSimpleName() + "pero se recibió " + value.getClass().getSimpleName());
+        }
+        @SuppressWarnings("unchecked")
+        T content = (T) value;
 
-        //Permitir que sea de tipo NA
-
-        //Comprobar si T coincide con el tipo de la columna
-        cells.get(i).setValue(value);
+        if(cells.get(i)!=null){
+            Cell<T> cell = cells.get(i);
+            cell.setValue(content);
+        }else{
+            Cell<T> cell = new Cell<>(content);
+            cells.set(i, cell);
+        }
+        
     }
 
     public int countNA(){

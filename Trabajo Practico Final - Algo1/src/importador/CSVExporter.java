@@ -2,10 +2,8 @@ package importador;
 
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Array;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -61,24 +59,24 @@ public class CSVExporter {
     //Exportar dataFrame
     public void exportDataFrame(String filepath, DataFrame df){
 
-        List<Column> columns = df.getColumns();
+        List<Column<?>> columns = df.getColumns();
         List<Row> rows = df.getRows();
 
         if(!hasHeaders){
 
-            String [][] celdas = new String [df.contarFilas()][df.contarColumnas()];
+            String [][] celdas = new String [df.countRows()][df.countColumns()];
 
             for (int i=0; i<rows.size(); i++){
                 for (int j=0; j<columns.size(); j++){
-                    celdas[i][j] = columns.get(j).getCells().get(i).toString();
+                    celdas[i][j] = columns.get(j).getCells().get(i).toString(); //Ese error se da porque puse getCells como protected
                 }
             }
             exportCSV(filepath, celdas);
         }else{
 
-            String [][] celdas = new String [df.contarFilas()+1][df.contarColumnas()];
+            String [][] celdas = new String [df.countRows()+1][df.countColumns()];
             int j=0;
-            for(Column c:columns){
+            for(Column<?> c:columns){
                 celdas[0][j] = c.getLabel().toString();
                 j++;
             }

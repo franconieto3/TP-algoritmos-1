@@ -272,7 +272,7 @@ public class DataFrame {
 
     // --- 4.0 Metodos de acceso indexado y selección ---
 
-    public Row getRow(Object input) throws IndexOutOfBoundsException {
+    public Row getRow(Object input) throws IndexOutOfBoundsException, IllegalArgumentException {
 
         Label<?> label = validateLabel(input);
         int index = indexOf(label,rows);
@@ -280,7 +280,7 @@ public class DataFrame {
         return new Row(rows.get(index));
     }
 
-    public Column<?> getColumn(Object input) throws IndexOutOfBoundsException {
+    public Column<?> getColumn(Object input) throws IndexOutOfBoundsException, IllegalArgumentException {
 
         Label<?> label = validateLabel(input);
         int index = indexOf(label, columns);
@@ -289,13 +289,13 @@ public class DataFrame {
         return new Column<>(columns.get(index));
     }
 
-    public Cell<?> getCell(Object rowLabel, Object columnLabel){
+    public Cell<?> getCell(Object rowLabel, Object columnLabel) throws IndexOutOfBoundsException{
         int indice = this.getRow(rowLabel).getIndex();
         Cell<?> celda = this.getColumn(columnLabel).getCell(indice);
         return new Cell<>(celda);
     }
 
-    private Label<?> validateLabel(Object input){
+    private Label<?> validateLabel(Object input) throws IllegalArgumentException{
         if (input instanceof Label<?>) {
             return (Label<?>) input;
         } else if (input instanceof String) {
@@ -307,7 +307,7 @@ public class DataFrame {
         }
     }
 
-    protected int indexOf(Label<?> label, List<? extends Labeled> axis) {
+    protected int indexOf(Label<?> label, List<? extends Labeled> axis) throws IndexOutOfBoundsException {
         for (int i = 0; i < axis.size(); i++) {
             if (label.equals(axis.get(i).getLabel())) {
                 return i;
@@ -316,69 +316,60 @@ public class DataFrame {
         throw new IndexOutOfBoundsException("Etiqueta no encontrada: " + label);
     }
 
-    /* 
+    
 
     //Modificación del DataFrame
 
     //Modificación de una celda
-    public void setValue(Object rowLabel, Object columnLabel, Object newValue) {
-        int rowIndex = findRow(new Label(rowLabel));
-        int colIndex = findColumn(new Label(columnLabel));
+    public void setValue(Object rowLabel, Object columnLabel, Object newValue) throws IllegalArgumentException, IndexOutOfBoundsException{
+        Label<?> rLabel = validateLabel(rowLabel);
+        Label<?> cLabel = validateLabel(columnLabel);
 
-        Column col = columns.get(colIndex);
-        Class<?> expectedType = col.getType();
+        int rowIndex = indexOf(rLabel, this.rows);
+        int colIndex = indexOf(cLabel, this.columns);
 
-        if (newValue != null && !expectedType.isInstance(newValue)) {
-            throw new IllegalArgumentException(
-                "Tipo incompatible: se esperaba " + expectedType.getSimpleName() +
-                " pero se recibió " + newValue.getClass().getSimpleName()
-            );
-        }
+        Row row = rows.get(rowIndex);
+        Column<?> col = columns.get(colIndex);
         
-        columns.get(colIndex).getCell(rowIndex).setValue(newValue);
+        col.setCell(row.getIndex(), newValue);
     }
-
+    
     //Inserción de una columna
-    public void addColumn(Column newColumn) {
-        if (newColumn.getCells().size() != rows.size()) {
+    public void addColumn(Column<?> newColumn) {
+        if (newColumn.size() != rows.size()) {
             throw new IllegalArgumentException("La nueva columna no tiene la misma cantidad de filas.");
         }
         columns.add(newColumn);
     }
-
+    
+    
     //Inserción de una columna a partir de una secuencia lineal de Java
   
     public void addColumnFromList(List<?> data, Object label) {
         if (data.size() != rows.size()) {
             throw new IllegalArgumentException("La lista no tiene la misma cantidad de filas.");
         }
-        Column column = new Column(new Label<>(label));
-
+        Column<?> column = new Column<>(validateLabel(label));
         for (Object value : data) {
-
-            if (value == null || value.toString().equalsIgnoreCase("N/A")) {
-                column.addCell(new Cell(new MissingValue())); // valores faltantes tratados como null
-                continue;
-            }
-
-            if (!(value instanceof Number || value instanceof Boolean || value instanceof String)) {
-                throw new IllegalArgumentException("Tipo no soportado en la columna '" + label + "': " + value.getClass());
-            }   
-            column.addCell(new Cell(value));
+            column.add(value);
         }
         columns.add(column);
     }
-
+ 
     //Eliminación de una columna
     public void removeColumn(Object columnLabel) {
-        int index = findColumn(new Label(columnLabel));
+        Label<?> cLabel = validateLabel(columnLabel);
+        int index = indexOf(cLabel, this.columns);
         columns.remove(index);
     }
+    
+    
     //Eliminación de una fila
     public void removeRow(Object rowLabel) {
-        int index = findRow(new Label(rowLabel));
+        Label<?> rLabel = validateLabel(rowLabel);
+        int index = indexOf(rLabel, this.rows);
         rows.remove(index);
-        for (Column col : columns) {
+        for (Column<?> col : columns) {
             col.getCells().remove(index);
         }
         //Reacomodo los indices de las filas
@@ -386,7 +377,7 @@ public class DataFrame {
             rows.get(i).setIndex(i);
         }
     }
-
+    /* 
     //Slicing
     public void slice(List<?> columnLabels, List<?> rowLabels){
         handler.slice(columnLabels, rowLabels);
@@ -425,22 +416,22 @@ public class DataFrame {
         int colIndex = findColumn(new Label(label));
         Column column = columns.get(colIndex);
 
-    Class<?> expectedType = column.getType();
+        Class<?> expectedType = column.getType();
 
-    if (value != null && !expectedType.isInstance(value)) {
-        throw new IllegalArgumentException(
-            "Tipo incompatible: se esperaba " + expectedType.getSimpleName() +
-            " pero se recibió " + value.getClass().getSimpleName()
-        );
-    }
+        if (value != null && !expectedType.isInstance(value)) {
+            throw new IllegalArgumentException(
+                "Tipo incompatible: se esperaba " + expectedType.getSimpleName() +
+                " pero se recibió " + value.getClass().getSimpleName()
+            );
+        }
 
-    for (int i=0; i< column.size(); i++) {
-            List<Cell<?>> cellList = column.getCells();
-            Cell celda = cellList.get(i);
-            if (celda.getValue() instanceof MissingValue) {
-                column.getCell(i).setValue(value);
-            }
-    }
+        for (int i=0; i< column.size(); i++) {
+                List<Cell<?>> cellList = column.getCells();
+                Cell celda = cellList.get(i);
+                if (celda.getValue() instanceof MissingValue) {
+                    column.getCell(i).setValue(value);
+                }
+        }
     
    }
     */
