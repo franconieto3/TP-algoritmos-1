@@ -229,16 +229,14 @@ public class DataFrame {
     // --- 3.0 Metodos de Visualización ---
     
     public void head(int n){
-        DataFrameView tabla = new DataFrameView();
-        tabla.viewDataFrame(0,n, this);
+        DataFrameView.viewDataFrame(0,n, this);
     }
 
     public void tail(int n){
         int totalRows = rows.size();
         int start = Math.max(0, totalRows - n); // En caso de que n > totalRows
 
-        DataFrameView tabla = new DataFrameView();
-        tabla.viewDataFrame(start,rows.size(), this);  
+        DataFrameView.viewDataFrame(start,rows.size(), this);  
     }
     
     public void info(){
@@ -254,21 +252,27 @@ public class DataFrame {
             System.out.println(label + ": "+ (columns.size()-na) + " non-null, "+ tipo);
         }
     }
+
+    //Slicing
+    public void slice(List<?> columnLabels, List<?> rowLabels){
+        DataFrameView.sliceDataFrame(columnLabels, rowLabels, this);
+    }
  
     //Acceso indexado
 
     // --- 3.1 Metodos auxiliares de Visualización ---
-    /* 
-    protected List<?> buildRow(int i, List<Column<?>> list){
-        List<?> row = new ArrayList<>();
+    
+    protected List<Object> buildRow(int i, List<Column<?>> list){
+        List<Object> row = new ArrayList<>();
         for (Column<?> c : list){
-            row.add(c.getCell(i).getValue());
+            Object v = c.getCell(i).getValue();
+            row.add(v);
         }
         //System.out.println(i+": "+ row);
         return row;
     }
 
-*/
+
 
     // --- 4.0 Metodos de acceso indexado y selección ---
 
@@ -377,12 +381,9 @@ public class DataFrame {
             rows.get(i).setIndex(i);
         }
     }
-    /* 
-    //Slicing
-    public void slice(List<?> columnLabels, List<?> rowLabels){
-        handler.slice(columnLabels, rowLabels);
-    }
+     
 
+    /*
     //Copia
     public DataFrame copy(){
         return new DataFrame(this);

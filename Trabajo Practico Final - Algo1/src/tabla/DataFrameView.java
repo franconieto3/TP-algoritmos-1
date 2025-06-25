@@ -13,12 +13,12 @@ public class DataFrameView {
     //Constructor
     public DataFrameView(){
 
-    }
+    }/* 
     public DataFrameView(int MAX_ROWS, int MAX_COLS, int MAX_CELL_CHARS){
         this.MAX_ROWS = MAX_ROWS;
         this.MAX_COLS = MAX_COLS;
         this.MAX_CELL_CHARS = MAX_CELL_CHARS;
-    }
+    }*/
 
     public static String formatTable(List<? extends List<?>> data, List<?> rowLabels, List<?> columnLabels) {
         StringBuilder sb = new StringBuilder();
@@ -79,7 +79,7 @@ public class DataFrameView {
     }
 
 
-    public void viewDataFrame(int start, int end, DataFrame df){
+    public static void viewDataFrame(int start, int end, DataFrame df){
         List<Label<?>> colLabels = df.getColumnLabels();
         List<Label<?>> rowLabels =  new ArrayList<>();
         List<Column<?>> columns = df.getColumns();
@@ -99,6 +99,58 @@ public class DataFrameView {
 
         String tabla = formatTable(data, rowLabels, colLabels);
         System.out.println(tabla);
+    }
+
+    public static void sliceDataFrame(List<?> columnLabels, List<?> rowLabels, DataFrame df){
+        List<Column<?>> columnList = new ArrayList<>();
+        List<List<Object>> rowList = new ArrayList<>();
+        List<Label<?>> cLabels = new ArrayList<>();
+        List<Label<?>> rLabels = new ArrayList<>();
+
+        //Si no se especifica una lista de columnas o filas, se interpreta como que se quieren mostrar todas
+        if(columnLabels==null || columnLabels.isEmpty()){
+            columnLabels = df.getColumnLabels();
+        }
+        if(rowLabels==null || rowLabels.isEmpty() ){
+            rowLabels = df.getRowLabels();  
+        }
+        
+        for (Object l:columnLabels){
+            Column<?> c = df.getColumn(l);
+            columnList.add(c);
+            cLabels.add(c.getLabel());
+        }
+         
+        for (Object l:rowLabels){
+            Row r = df.getRow(l);
+            rowList.add(df.buildRow(r.getIndex(),columnList));
+            rLabels.add(r.getLabel());
+        }
+
+        System.out.println(formatTable(rowList, rLabels, cLabels));
+    }
+
+    //Getters 
+
+    public static int getMaxRows(){
+        return MAX_ROWS;
+    }
+    public static int getMaCols(){
+        return MAX_COLS;
+    }
+    public static int getMaxCellChars(){
+        return MAX_CELL_CHARS;
+    }
+
+    //Setters
+    public static void setMaxRows(int maxRows){
+        MAX_ROWS = maxRows;
+    }
+    public static void setMaxCols(int maxCols){
+        MAX_COLS = maxCols;
+    }
+    public static void setMaxCellChars(int maxCellChars){
+        MAX_CELL_CHARS = maxCellChars;
     }
 
 }
