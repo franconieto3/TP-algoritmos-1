@@ -105,18 +105,6 @@ public class CSVParser {
     }
 
     public static Object[][] parserLineas(List<String> lineas, String sep) throws CSVParserException {
-        /*Convierte una lista de líneas (como las obtenidas de un archivo CSV) en una matriz bidimensional de String.
-
-        Divide cada línea por comas (,) usando split(",").
-
-        Verifica que todas las líneas tengan la misma cantidad de campos. Si no, lanza una excepción personalizada CSVParserException. 
-        
-        ----------------------------------------------------------------------------------------------------------------------------------
-        Modificaciones hechas: 
-        - Agrego la opción de elegir el separador. Aunque no sé si es mejor definir al separador como atributo de clase y que se modifique con getter y setter
-        - Agrego la posibilidad de que si hay un espacio vacío entre comas, su posición en el array sea completado por un null, para después ser manejado como N/A 
-        - Parseo cada dato de String al tipo de dato más adecuado con ParseCellValue
-        */
         
         if (sep == null){
             sep = ",";

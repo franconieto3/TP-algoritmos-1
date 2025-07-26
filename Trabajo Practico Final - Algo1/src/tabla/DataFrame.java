@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
+import java.util.Random;
+import java.util.function.*;
 
 
 import exceptions.*;
@@ -265,8 +268,12 @@ public class DataFrame {
     protected List<Object> buildRow(int i, List<Column<?>> list){
         List<Object> row = new ArrayList<>();
         for (Column<?> c : list){
-            Object v = c.getCell(i).getValue();
-            row.add(v);
+            if(c.getCell(i)==null){
+                row.add(null);
+            }else{
+                Object v = c.getCell(i).getValue();
+                row.add(v);
+            }
         }
         //System.out.println(i+": "+ row);
         return row;
@@ -381,29 +388,27 @@ public class DataFrame {
             rows.get(i).setIndex(i);
         }
     }
-     
-
-    /*
+    
     //Copia
     public DataFrame copy(){
         return new DataFrame(this);
     }
 
+    //Concatenación
+   public DataFrame concatenar(DataFrame other){
+        return DataFrameHandler.concatenar(other, this);
+   }
+    
     //Filtrado
 
-   public DataFrame filter(Map<Object, Predicate<Object>> conditions){
-        return handler.filter(conditions);
+   public DataFrame filter(Map<Label<?>, Predicate<Object>> conditions){
+        return DataFrameHandler.filter(conditions, this);
    }
-
+    /*
    //Ordenamiento
 
    public DataFrame sortBy(List<? extends Object> labels, boolean descending){
         return handler.sortBy(labels, descending);
-   }
-
-   //Concatenación
-   public DataFrame concatenar(DataFrame other){
-        return handler.concatenar(other);
    }
 
    //Sampleo

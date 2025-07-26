@@ -11,7 +11,7 @@ public class Label <T>{
     }
     // Constructor copia
     public Label(Label<T> other) throws IllegalArgumentException {
-        validarLabel(other.value);
+        this.value = other.value;
     }
 
     //Getter

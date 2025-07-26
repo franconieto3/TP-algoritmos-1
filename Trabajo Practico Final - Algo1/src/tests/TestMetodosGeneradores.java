@@ -27,7 +27,7 @@ public class TestMetodosGeneradores {
             lista_labels.add("Apellido");
 
             df2.slice(lista_labels,null);
-
+ 
             //Concatenación de DataFrames
             System.out.println("\n Concatencación de df1 y df2 \n");
             DataFrame df3 = df1.concatenar(df2);
@@ -38,17 +38,17 @@ public class TestMetodosGeneradores {
             df3.setValue(2, "Edad", 25);
 
             df3.head(10);
-
+/*
             //Filtrado
             System.out.println("\n Filtrado: conservo solo las filas donde 'Edad'>24: \n");
-            Map<Object, Predicate<Object>> condiciones = new HashMap<>();
-            condiciones.put("Edad", v -> ((Integer)v) > 24);
+            Map<Label<?>, Predicate<Object>> condiciones = new HashMap<>();
+            condiciones.put(new Label<>("Edad"), v -> ((Integer)v) > 24);
 
             DataFrame dfFiltrado = df3.filter(condiciones);
             dfFiltrado.head(5);
 
             System.out.println("Agrego la condición de filtrado para que solo se llamen 'Ana' \n");
-            condiciones.put("Nombre", v -> ((String)v).equals("Ana"));
+            condiciones.put(new Label<>("Nombre"), v -> ((String)v).equals("Ana"));
 
             DataFrame dfFiltrado2 = df3.filter(condiciones);
             dfFiltrado2.head(5);
@@ -74,7 +74,7 @@ public class TestMetodosGeneradores {
             //Sampleo el 60% de df3
             System.out.println("\n Sampleo el 60% de df3: \n");
             df3.sample(60).head(10);
-
+*/
             //CSVExporter exporter = new CSVExporter();
             //exporter.exportDataFrame(System.getProperty("user.dir").toString()+"/Trabajo Practico Final - Algo1/prueba4.csv", df3);
 

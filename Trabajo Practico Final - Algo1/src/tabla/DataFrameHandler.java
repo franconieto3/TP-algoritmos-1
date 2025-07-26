@@ -16,57 +16,54 @@ public class DataFrameHandler {
     //Constructor
     DataFrameHandler(DataFrame df){
     }
-/* 
+ 
      
      //Filtra las filas del DataFrame basado en una o más condiciones.
     
-    public DataFrame filter(Map<Object, Predicate<Object>> conditions) {
+    public static DataFrame filter(Map<Label<?>, Predicate<Object>> conditions, DataFrame df) {
         List<Row> rows = df.getRows();
-        List<Column> columns = df.getColumns(); 
+        List<Column<?>> columns = df.getColumns(); 
         List<List<Object>> filteredData = new ArrayList<>();
         
 
         for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
-            Row row = rows.get(rowIndex);
             boolean cumple = true;
 
-            for (Map.Entry<Object, Predicate<Object>> entry : conditions.entrySet()) {
-                Object colLabel = entry.getKey();
+            for (Map.Entry<Label<?>, Predicate<Object>> entry : conditions.entrySet()) {
+                Label<?> colLabel = entry.getKey();
                 Predicate<Object> predicate = entry.getValue();
 
-                int colIndex = df.buscarColumna(new Label<>(colLabel));
-                Cell<?> cell = columns.get(colIndex).getCell(rowIndex);
-                if(cell.getValue() instanceof MissingValue){
+                int colIndex = df.indexOf(colLabel, columns);
+                if(columns.get(colIndex).getCell(rowIndex) == null){
                     cumple = false;
                     break;
-                }
-                if (!predicate.test(cell.getValue())) {
-                    cumple = false;
-                    break;
+                }else{
+                    Cell<?> cell = columns.get(colIndex).getCell(rowIndex);
+
+                    if (!predicate.test(cell.getValue())) {
+                        cumple = false;
+                        break;
+                    }
                 }
             }
 
             if (cumple) {
                 List<Object> filaValores = new ArrayList<>();
-                for (Column column : columns) {
+                for (Column<?> column : columns) {
                     filaValores.add(column.getCell(rowIndex).getValue());
                 }
                 filteredData.add(filaValores);
             }
         }
 
-        List<Object> columnLabels = new ArrayList<>();
-        for (Column column : columns) {
-            columnLabels.add(column.getLabel().getLabel());
-        }
-
         try {
-            return new DataFrame(filteredData, columnLabels, null);
+            return new DataFrame(filteredData, df.getColumnLabels(), null);
         } catch (InvalidShape | IllegalArgumentException | InvalidTypeException e) {
             throw new RuntimeException("Error al construir el DataFrame filtrado: " + e.getMessage(), e);
         }
     }
 
+/* 
         public DataFrame sortBy(List<? extends Object> labels, boolean descending) {
 
             List<Row> rows = df.getRows();
@@ -139,19 +136,20 @@ public class DataFrameHandler {
                 throw new RuntimeException("Error al construir el DataFrame ordenado: " + e.getMessage(), e);
             }
     }
+*/ 
 
-    public DataFrame concatenar(DataFrame other){
+    public static DataFrame concatenar(DataFrame other, DataFrame df){
 
         //Chequeo si la cantidad de columnas coinciden
         
-        if(df.contarColumnas() != other.contarColumnas()){
+        if(df.countColumns() != other.countColumns()){
             throw new InvalidShape("No se pueden concatenar los data-frames. La cantidad de columnas de ambos es distinta");
         }
 
         //Chequeo si los Labels coinciden y tipos de datos coinciden
-        for (int i =0; i < df.contarColumnas();i++){
-            Column col1 = df.getColumns().get(i);
-            Column col2 = other.getColumns().get(i);
+        for (int i =0; i < df.countColumns();i++){
+            Column<?> col1 = df.getColumns().get(i);
+            Column<?> col2 = other.getColumns().get(i);
 
             if(!col1.matches(col2)){
                 throw new RuntimeException("Las columnas de ambas tablas no coinciden en Label o en tipo de dato");
@@ -171,15 +169,10 @@ public class DataFrameHandler {
         for (Row r:df2.getRows()){
             data.add(df2.buildRow(r.getIndex(),df2.getColumns()));
         }
-        
-        // Se extraen las etiquetas de columnas
-            List<Object> columnLabels = df1.getColumns().stream()
-                                            .map(c -> c.getLabel().getLabel())
-                                            .collect(Collectors.toList());
-        
-        return new DataFrame(data,columnLabels,null);
+        System.out.println("Checkpoint");
+        return new DataFrame(data,df1.getColumnLabels(),null);
     }
-
+/* 
     public DataFrame sample(int n) throws IllegalArgumentException {
         List<Row> rows = df.getRows();
         List<Column> columns = df.getColumns();

@@ -114,19 +114,19 @@ public class DataFrameView {
         if(rowLabels==null || rowLabels.isEmpty() ){
             rowLabels = df.getRowLabels();  
         }
-        
+
         for (Object l:columnLabels){
             Column<?> c = df.getColumn(l);
             columnList.add(c);
             cLabels.add(c.getLabel());
         }
-         
+
         for (Object l:rowLabels){
             Row r = df.getRow(l);
             rowList.add(df.buildRow(r.getIndex(),columnList));
             rLabels.add(r.getLabel());
         }
-
+    
         System.out.println(formatTable(rowList, rLabels, cLabels));
     }
 
